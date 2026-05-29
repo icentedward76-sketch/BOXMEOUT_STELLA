@@ -11,13 +11,10 @@ import { BetForm } from '../../../components/bet/BetForm';
 import { BetList } from '../../../components/bet/BetList';
 import { stellarExplorerUrl } from '../../../services/wallet';
 import { fetchBetsByMarket, NotFoundError } from '../../../services/api';
+import { ClaimWinningsPanel } from '../../../components/market/ClaimWinningsPanel';
 import { useToast } from '../../../components/ui/ToastProvider';
 import { useAppStore } from '../../../store';
 import type { Bet } from '../../../types';
-
-function fmtXlm(stroops: string) {
-  return (parseInt(stroops, 10) / 1e7).toLocaleString(undefined, { maximumFractionDigits: 2 });
-}
 
 export default function MarketDetailContent({ market_id }: { market_id: string }): JSX.Element {
   const { market, isLoading, error } = useMarket(market_id);
@@ -31,7 +28,9 @@ export default function MarketDetailContent({ market_id }: { market_id: string }
     setBetsLoading(true);
     fetchBetsByMarket(market_id)
       .then((bets) => setRecentBets(bets.slice(0, 20)))
-      .catch(() => {/* non-critical */})
+      .catch(() => {
+        /* non-critical */
+      })
       .finally(() => setBetsLoading(false));
 
     if (market.status === 'locked') {
@@ -70,9 +69,13 @@ export default function MarketDetailContent({ market_id }: { market_id: string }
         <div className="flex flex-wrap items-center gap-2">
           <MarketStatusBadge status={market.status} />
           {market.title_fight && (
-            <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full">🏆 Title Fight</span>
+            <span className="text-xs text-amber-400 bg-amber-400/10 px-2 py-0.5 rounded-full">
+              🏆 Title Fight
+            </span>
           )}
-          <span className="text-xs text-gray-400 bg-gray-800 px-2 py-0.5 rounded-full">{market.weight_class}</span>
+          <span className="text-xs text-gray-400 bg-gray-800 px-2 py-0.5 rounded-full">
+            {market.weight_class}
+          </span>
         </div>
         <h1 className="text-3xl font-black text-white break-words">
           {market.fighter_a} <span className="text-gray-500">vs</span> {market.fighter_b}
@@ -109,8 +112,9 @@ export default function MarketDetailContent({ market_id }: { market_id: string }
       {/* Main content grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Bet form — right col on desktop */}
-        <div className="lg:col-start-3 lg:row-start-1 w-full">
+        <div className="lg:col-start-3 lg:row-start-1 w-full space-y-4">
           <BetForm market={market} />
+          <ClaimWinningsPanel market={market} allBets={recentBets} />
         </div>
 
         {/* Recent bets — left 2 cols on desktop */}
@@ -129,7 +133,10 @@ export default function MarketDetailContent({ market_id }: { market_id: string }
       {market.status === 'resolved' && market.outcome && (
         <div className="bg-gray-900 rounded-xl p-4 text-sm space-y-2">
           <p className="text-gray-400">
-            Outcome: <span className="text-white font-semibold capitalize">{market.outcome.replace('_', ' ')}</span>
+            Outcome:{' '}
+            <span className="text-white font-semibold capitalize">
+              {market.outcome.replace('_', ' ')}
+            </span>
           </p>
           {market.oracle_address && (
             <p className="text-gray-400">
